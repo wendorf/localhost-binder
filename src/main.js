@@ -2,8 +2,6 @@ import { exit, env } from 'node:process';
 import { startServer } from './utilities/server.js';
 import { registerCloseListener } from './utilities/http.js';
 
-const args = { _: [ 'public/' ], '--debug': true }
-
 const config = { public: 'public', etag: true, symlinks: undefined }
 const endpoint = { port: 80 }
 // Disabling this rule as we want to start each server one by one.
@@ -11,7 +9,6 @@ const endpoint = { port: 80 }
 const { local, network, previous } = await startServer(
     endpoint,
     config,
-    args,
 );
 
 let message = ""

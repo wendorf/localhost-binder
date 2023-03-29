@@ -12,14 +12,12 @@ const compress = promisify(compression());
  *
  * @param endpoint - The endpoint to listen on.
  * @param config - The configuration for the `serve-handler` middleware.
- * @param args - The arguments passed to the CLI.
  * @param previous - Something previous.
  * @returns The address of the server.
  */
 export const startServer = async (
     endpoint,
     config,
-    args,
     previous,
 ) => {
     // Define the request handler for the server.
@@ -119,7 +117,7 @@ export const startServer = async (
         });
         // If the port is already taken, then start the server on a random port
         // instead.
-        if (isClosed) return startServer({ port: 0 }, config, args, port);
+        if (isClosed) return startServer({ port: 0 }, config, port);
 
         // Otherwise continue on to starting the server.
     }
