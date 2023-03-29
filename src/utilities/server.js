@@ -17,6 +17,7 @@ const compress = promisify(compression());
  * @param endpoint - The endpoint to listen on.
  * @param config - The configuration for the `serve-handler` middleware.
  * @param args - The arguments passed to the CLI.
+ * @param previous - Something previous.
  * @returns The address of the server.
  */
 export const startServer = async (
