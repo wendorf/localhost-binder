@@ -1,19 +1,15 @@
 import { exit } from 'node:process';
 import http from 'node:http';
-import { promisify } from 'node:util';
 import { networkInterfaces as getNetworkInterfaces } from 'node:os';
 import handler from 'serve-handler';
-import compression from 'compression';
 
 const networkInterfaces = getNetworkInterfaces();
-const compress = promisify(compression());
 
 export const startServer = async (
     endpoint,
     config,
     previous,
 ) => {
-    // Define the request handler for the server.
     const serverHandler = (
         request,
         response,
@@ -21,30 +17,7 @@ export const startServer = async (
         // We can't return a promise in a HTTP request handler, so we run our code
         // inside an async function instead.
         const run = async () => {
-            // Log the request.
-            const requestTime = new Date();
-            const formattedTime = `${requestTime.toLocaleDateString()} ${requestTime.toLocaleTimeString()}`;
-            const ipAddress =
-                request.socket.remoteAddress?.replace('::ffff:', '') ?? 'unknown';
-            const requestUrl = `${request.method ?? 'GET'} ${request.url ?? '/'}`;
-            console.info(
-                formattedTime,
-                ipAddress,
-                requestUrl,
-            );
-
-            await compress(request, response);
-
-            // Let the `serve-handler` module do the rest.
             await handler(request, response, config);
-
-            // Before returning the response, log the status code and time taken.
-            const responseTime = Date.now() - requestTime.getTime();
-            console.info(
-                formattedTime,
-                ipAddress,
-                `Returned ${response.statusCode} in ${responseTime} ms`,
-            );
         };
 
         // Then we run the async function, and re-throw any errors.
