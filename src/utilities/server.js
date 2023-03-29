@@ -1,6 +1,4 @@
 import http from 'node:http';
-import https from 'node:https';
-import { readFile } from 'node:fs/promises';
 import handler from 'serve-handler';
 import compression from 'compression';
 import isPortReachable from 'is-port-reachable';
@@ -38,32 +36,24 @@ export const startServer = async (
             const ipAddress =
                 request.socket.remoteAddress?.replace('::ffff:', '') ?? 'unknown';
             const requestUrl = `${request.method ?? 'GET'} ${request.url ?? '/'}`;
-            if (!args['--no-request-logging'])
-                console.info(
-                    formattedTime,
-                    ipAddress,
-                    requestUrl,
-                );
+            console.info(
+                formattedTime,
+                ipAddress,
+                requestUrl,
+            );
 
-            if (args['--cors']) {
-                response.setHeader('Access-Control-Allow-Origin', '*');
-                response.setHeader('Access-Control-Allow-Credentials', 'true');
-                response.setHeader('Access-Control-Allow-Private-Network', 'true');
-            }
-            if (!args['--no-compression'])
-                await compress(request, response);
+            await compress(request, response);
 
             // Let the `serve-handler` module do the rest.
             await handler(request, response, config);
 
             // Before returning the response, log the status code and time taken.
             const responseTime = Date.now() - requestTime.getTime();
-            if (!args['--no-request-logging'])
-                console.info(
-                    formattedTime,
-                    ipAddress,
-                    `Returned ${response.statusCode} in ${responseTime} ms`,
-                );
+            console.info(
+                formattedTime,
+                ipAddress,
+                `Returned ${response.statusCode} in ${responseTime} ms`,
+            );
         };
 
         // Then we run the async function, and re-throw any errors.
@@ -72,33 +62,7 @@ export const startServer = async (
         });
     };
 
-    // Create the server.
-    const sslCert = args['--ssl-cert'];
-    const sslKey = args['--ssl-key'];
-    const sslPass = args['--ssl-pass'];
-    const isPFXFormat =
-        sslCert && /[.](?<extension>pfx|p12)$/.exec(sslCert) !== null;
-    const useSsl = sslCert && (sslKey || sslPass || isPFXFormat);
-
-    let serverConfig = {};
-    if (useSsl && sslCert && sslKey) {
-        // Format detected is PEM due to usage of SSL Key and Optional Passphrase.
-        serverConfig = {
-            key: await readFile(sslKey),
-            cert: await readFile(sslCert),
-            passphrase: sslPass ? await readFile(sslPass, 'utf8') : '',
-        };
-    } else if (useSsl && sslCert && isPFXFormat) {
-        // Format detected is PFX.
-        serverConfig = {
-            pfx: await readFile(sslCert),
-            passphrase: sslPass ? await readFile(sslPass, 'utf8') : '',
-        };
-    }
-
-    const server = useSsl
-        ? https.createServer(serverConfig, serverHandler)
-        : http.createServer(serverHandler);
+    const server = http.createServer(serverHandler);
 
     // Once the server starts, return the address it is running on so the CLI
     // can tell the user.
@@ -123,7 +87,7 @@ export const startServer = async (
             else address = details.address;
             const ip = getNetworkAddress();
 
-            const protocol = useSsl ? 'https' : 'http';
+            const protocol = 'http';
             local = `${protocol}://${address}:${details.port}`;
             network = ip ? `${protocol}://${ip}:${details.port}` : undefined;
         }
