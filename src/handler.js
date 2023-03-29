@@ -1,7 +1,6 @@
 // Native
 import {promisify} from 'node:util';
 import path from 'node:path';
-import {createHash} from 'node:crypto';
 import {realpath, lstat, createReadStream, readdir} from 'node:fs';
 
 // Packages
@@ -14,22 +13,6 @@ import bytes from 'bytes';
 import contentDisposition from 'content-disposition';
 import isPathInside from 'path-is-inside';
 import parseRange from 'range-parser';
-
-const etags = new Map();
-
-const calculateSha = (handlers, absolutePath) =>
-    new Promise((resolve, reject) => {
-        const hash = createHash('sha1');
-        hash.update(path.extname(absolutePath));
-        hash.update('-');
-        const rs = handlers.createReadStream(absolutePath);
-        rs.on('error', reject);
-        rs.on('data', buf => hash.update(buf));
-        rs.on('end', () => {
-            const sha = hash.digest('hex');
-            resolve(sha);
-        });
-    });
 
 const sourceMatches = (source, requestPath, allowSegments) => {
     const keys = [];
@@ -188,7 +171,7 @@ const appendHeaders = (target, source) => {
 };
 
 const getHeaders = async (handlers, config, current, absolutePath, stats) => {
-    const {headers: customHeaders = [], etag = false} = config;
+    const {headers: customHeaders = []} = config;
     const related = {};
     const {base} = path.parse(absolutePath);
     const relativePath = path.relative(current, absolutePath);
@@ -220,16 +203,7 @@ const getHeaders = async (handlers, config, current, absolutePath, stats) => {
             'Accept-Ranges': 'bytes'
         };
 
-        if (etag) {
-            let [mtime, sha] = etags.get(absolutePath) || [];
-            if (Number(mtime) !== Number(stats.mtime)) {
-                sha = await calculateSha(handlers, absolutePath);
-                etags.set(absolutePath, [stats.mtime, sha]);
-            }
-            defaultHeaders['ETag'] = `"${sha}"`;
-        } else {
-            defaultHeaders['Last-Modified'] = stats.mtime.toUTCString();
-        }
+        defaultHeaders['Last-Modified'] = stats.mtime.toUTCString();
 
         const contentType = mime.contentType(base);
 
@@ -732,19 +706,6 @@ export default async (request, response, config = {}, methods = {}) => {
     if (streamOpts.start !== undefined && streamOpts.end !== undefined) {
         headers['Content-Range'] = `bytes ${streamOpts.start}-${streamOpts.end}/${stats.size}`;
         headers['Content-Length'] = streamOpts.end - streamOpts.start + 1;
-    }
-
-    // We need to check for `headers.ETag` being truthy first, otherwise it will
-    // match `undefined` being equal to `undefined`, which is true.
-    //
-    // Checking for `undefined` and `null` is also important, because `Range` can be `0`.
-    //
-    // eslint-disable-next-line no-eq-null
-    if (request.headers.range == null && headers.ETag && headers.ETag === request.headers['if-none-match']) {
-        response.statusCode = 304;
-        response.end();
-
-        return;
     }
 
     response.writeHead(response.statusCode || 200, headers);

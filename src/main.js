@@ -128,7 +128,7 @@ export const getNetworkAddress = () => {
     }
 };
 
-const config = { public: 'public', etag: true, symlinks: undefined }
+const config = { public: 'public', symlinks: undefined }
 const endpoint = { port: 80 }
 // Disabling this rule as we want to start each server one by one.
 // eslint-disable-next-line no-await-in-loop
