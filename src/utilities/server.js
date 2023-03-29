@@ -4,7 +4,6 @@ import { readFile } from 'node:fs/promises';
 import handler from 'serve-handler';
 import compression from 'compression';
 import isPortReachable from 'is-port-reachable';
-import chalk from 'chalk';
 import { getNetworkAddress, registerCloseListener } from './http.js';
 import { promisify } from 'node:util';
 
@@ -41,9 +40,9 @@ export const startServer = async (
             const requestUrl = `${request.method ?? 'GET'} ${request.url ?? '/'}`;
             if (!args['--no-request-logging'])
                 console.info(
-                    chalk.dim(formattedTime),
-                    chalk.yellow(ipAddress),
-                    chalk.cyan(requestUrl),
+                    formattedTime,
+                    ipAddress,
+                    requestUrl,
                 );
 
             if (args['--cors']) {
@@ -61,11 +60,9 @@ export const startServer = async (
             const responseTime = Date.now() - requestTime.getTime();
             if (!args['--no-request-logging'])
                 console.info(
-                    chalk.dim(formattedTime),
-                    chalk.yellow(ipAddress),
-                    chalk[response.statusCode < 400 ? 'green' : 'red'](
-                        `Returned ${response.statusCode} in ${responseTime} ms`,
-                    ),
+                    formattedTime,
+                    ipAddress,
+                    `Returned ${response.statusCode} in ${responseTime} ms`,
                 );
         };
 

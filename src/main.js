@@ -1,5 +1,4 @@
-import { exit, env, stdout } from 'node:process';
-import chalk from 'chalk';
+import { exit, env } from 'node:process';
 import { startServer } from './utilities/server.js';
 import { registerCloseListener } from './utilities/http.js';
 
@@ -26,20 +25,16 @@ for (const endpoint of args['--listen']) {
         args,
     );
 
-    let message = chalk.green('Serving!');
+    let message = ""
     if (local) {
         const prefix = network ? '- ' : '';
         const space = network ? '    ' : '  ';
 
-        message += `\n\n${chalk.bold(`${prefix}Local:`)}${space}${local}`;
+        message += `\n\n${prefix}Local:${space}${local}`;
     }
-    if (network) message += `\n${chalk.bold('- Network:')}  ${network}`;
+    if (network) message += `\n- Network:  ${network}`;
     if (previous)
-        message += chalk.red(
-            `\n\nThis port was picked because ${chalk.underline(
-                previous.toString(),
-            )} is in use.`,
-        );
+        message += `\n\nThis port was picked because ${previous.toString()} is in use.`;
 
     console.info(message);
 }

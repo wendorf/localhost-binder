@@ -4,7 +4,6 @@
     "node": ">= 16"
   },
   "dependencies": {
-    "chalk": "^5.2.0",
     "compression": "^1.7.4",
     "is-port-reachable": "^4.0.0",
     "serve-handler": "^6.1.5"
