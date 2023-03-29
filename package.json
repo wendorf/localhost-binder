@@ -13,8 +13,7 @@
     "compression": "^1.7.4",
     "is-port-reachable": "^4.0.0",
     "serve": "^14.2.0",
-    "serve-handler": "^6.1.5",
-    "update-check": "^1.5.4"
+    "serve-handler": "^6.1.5"
   },
   "scripts": {
     "start": "node src/main.js public/ --listen=80 --debug"
