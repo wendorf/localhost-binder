@@ -54,7 +54,11 @@ const registerCloseListener = (fn) => {
     process.on('exit', wrapper);
 };
 
-const endpoint = { port: 80 }
+const endpoint = { port: process.env.PORT || 80 }
+if (process.env.HOST) {
+    endpoint.host = process.env.HOST
+}
+console.log("endpoint", endpoint);
 startServer(endpoint);
 
 const getNetworkAddress = () => {
