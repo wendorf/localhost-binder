@@ -7,7 +7,6 @@ import isPortReachable from 'is-port-reachable';
 import chalk from 'chalk';
 import { getNetworkAddress, registerCloseListener } from './http.js';
 import { promisify } from 'node:util';
-import { logger } from './logger.js';
 
 const compress = promisify(compression());
 
@@ -41,7 +40,7 @@ export const startServer = async (
                 request.socket.remoteAddress?.replace('::ffff:', '') ?? 'unknown';
             const requestUrl = `${request.method ?? 'GET'} ${request.url ?? '/'}`;
             if (!args['--no-request-logging'])
-                logger.http(
+                console.info(
                     chalk.dim(formattedTime),
                     chalk.yellow(ipAddress),
                     chalk.cyan(requestUrl),
@@ -61,7 +60,7 @@ export const startServer = async (
             // Before returning the response, log the status code and time taken.
             const responseTime = Date.now() - requestTime.getTime();
             if (!args['--no-request-logging'])
-                logger.http(
+                console.info(
                     chalk.dim(formattedTime),
                     chalk.yellow(ipAddress),
                     chalk[response.statusCode < 400 ? 'green' : 'red'](

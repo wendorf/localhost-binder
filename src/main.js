@@ -3,7 +3,6 @@ import chalk from 'chalk';
 import boxen from 'boxen';
 import { startServer } from './utilities/server.js';
 import { registerCloseListener } from './utilities/http.js';
-import { logger } from './utilities/logger.js';
 
 const args = { _: [ 'public/' ], '--listen': [ { port: 80 } ], '--debug': true }
 
@@ -12,7 +11,7 @@ if (!args['--listen'])
     args['--listen'] = [{ port: parseInt(env.PORT ?? '3000', 10) }];
 // Ensure that the user has passed only one directory to serve.
 if (args._.length > 1) {
-    logger.error('Please provide one path argument at maximum');
+    console.error('Please provide one path argument at maximum');
     exit(1);
 }
 
@@ -32,7 +31,7 @@ for (const endpoint of args['--listen']) {
     // a single line of text with the server address.
     if (!stdout.isTTY || env.NODE_ENV === 'production') {
         const suffix = local ? ` at ${local}` : '';
-        logger.info(`Accepting connections${suffix}`);
+        console.info(`Accepting connections${suffix}`);
 
         continue;
     }
@@ -53,7 +52,7 @@ for (const endpoint of args['--listen']) {
             )} is in use.`,
         );
 
-    logger.log(
+    console.log(
         boxen(message, {
             padding: 1,
             borderColor: 'green',
@@ -65,12 +64,12 @@ for (const endpoint of args['--listen']) {
 // Print out a message to let the user know we are shutting down the server
 // when they press Ctrl+C or kill the process externally.
 registerCloseListener(() => {
-    logger.log();
-    logger.info('Gracefully shutting down. Please wait...');
+    console.log();
+    console.info('Gracefully shutting down. Please wait...');
 
     process.on('SIGINT', () => {
-        logger.log();
-        logger.warn('Force-closing all open sockets...');
+        console.log();
+        console.error('Force-closing all open sockets...');
 
         exit(0);
     });
