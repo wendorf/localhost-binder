@@ -1,11 +1,8 @@
-import { cwd as getPwd, exit, env, stdout } from 'node:process';
-import path from 'node:path';
+import { exit, env, stdout } from 'node:process';
 import chalk from 'chalk';
 import boxen from 'boxen';
-import { resolve } from './utilities/promise.js';
 import { startServer } from './utilities/server.js';
 import { registerCloseListener } from './utilities/http.js';
-import { loadConfiguration } from './utilities/config.js';
 import { logger } from './utilities/logger.js';
 
 const args = { _: [ 'public/' ], '--listen': [ { port: 80 } ], '--debug': true }
@@ -19,19 +16,7 @@ if (args._.length > 1) {
     exit(1);
 }
 
-// Parse the configuration.
-const presentDirectory = getPwd();
-const directoryToServe = args._[0] ? path.resolve(args._[0]) : presentDirectory;
-const [configError, config] = await resolve(
-    loadConfiguration(presentDirectory, directoryToServe, args),
-);
-// Either TSC complains that `args` is undefined (which it shouldn't), or ESLint
-// rightfully complains of an unnecessary condition.
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-if (configError || !config) {
-    logger.error(configError.message);
-    exit(1);
-}
+const config = { public: 'public', etag: true, symlinks: undefined }
 
 // Start the server for each endpoint passed by the user.
 for (const endpoint of args['--listen']) {
