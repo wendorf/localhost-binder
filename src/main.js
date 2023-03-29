@@ -2,33 +2,13 @@ import { cwd as getPwd, exit, env, stdout } from 'node:process';
 import path from 'node:path';
 import chalk from 'chalk';
 import boxen from 'boxen';
-import clipboard from 'clipboardy';
-import manifest from '../package.json' assert { type: "json" };
 import { resolve } from './utilities/promise.js';
 import { startServer } from './utilities/server.js';
 import { registerCloseListener } from './utilities/http.js';
-import {
-    parseArguments,
-} from './utilities/cli.js';
 import { loadConfiguration } from './utilities/config.js';
 import { logger } from './utilities/logger.js';
 
-// Parse the options passed by the user.
-const [parseError, args] = await resolve(parseArguments());
-// Either TSC complains that `args` is undefined (which it shouldn't), or ESLint
-// rightfully complains of an unnecessary condition.
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-if (parseError || !args) {
-    logger.error(parseError.message);
-    exit(1);
-}
-
-// If the `version` or `help` arguments are passed, print the version or the
-// help text and exit.
-if (args['--version']) {
-    logger.log(manifest.version);
-    exit(0);
-}
+const args = { _: [ 'public/' ], '--listen': [ { port: 80 } ], '--debug': true }
 
 // Default to listening on port 3000.
 if (!args['--listen'])
@@ -53,21 +33,6 @@ if (configError || !config) {
     exit(1);
 }
 
-// If the user wants all the URLs rewritten to `/index.html`, make it happen.
-if (args['--single']) {
-    const { rewrites } = config;
-    const existingRewrites = Array.isArray(rewrites) ? rewrites : [];
-
-    // Ensure this is the first rewrite rule so it gets priority.
-    config.rewrites = [
-        {
-            source: '**',
-            destination: '/index.html',
-        },
-        ...existingRewrites,
-    ];
-}
-
 // Start the server for each endpoint passed by the user.
 for (const endpoint of args['--listen']) {
     // Disabling this rule as we want to start each server one by one.
@@ -77,8 +42,6 @@ for (const endpoint of args['--listen']) {
         config,
         args,
     );
-
-    const copyAddress = !args['--no-clipboard'];
 
     // If we are not in a TTY or Node is running in production mode, print
     // a single line of text with the server address.
@@ -104,19 +67,6 @@ for (const endpoint of args['--listen']) {
                 previous.toString(),
             )} is in use.`,
         );
-
-    // Try to copy the address to the user's clipboard too.
-    if (copyAddress && local) {
-        try {
-            // eslint-disable-next-line no-await-in-loop
-            await clipboard.write(local);
-            message += `\n\n${chalk.grey('Copied local address to clipboard!')}`;
-        } catch (error) {
-            logger.error(
-                `Cannot copy server address to clipboard: ${error.message}.`,
-            );
-        }
-    }
 
     logger.log(
         boxen(message, {
