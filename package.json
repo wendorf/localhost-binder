@@ -4,7 +4,7 @@
     "node": ">= 16"
   },
   "dependencies": {
-    "serve": "^14.0.1"
+    "serve": "^14.2.0"
   },
   "scripts": {
     "start": "serve public/ --listen=80 --debug"
