@@ -9,7 +9,6 @@ import { startServer } from './utilities/server.js';
 import { registerCloseListener } from './utilities/http.js';
 import {
     parseArguments,
-    getHelpText,
 } from './utilities/cli.js';
 import { loadConfiguration } from './utilities/config.js';
 import { logger } from './utilities/logger.js';
@@ -28,10 +27,6 @@ if (parseError || !args) {
 // help text and exit.
 if (args['--version']) {
     logger.log(manifest.version);
-    exit(0);
-}
-if (args['--help']) {
-    logger.log(getHelpText());
     exit(0);
 }
 
