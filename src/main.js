@@ -1,7 +1,7 @@
 import { exit } from 'node:process';
 import http from 'node:http';
 import { networkInterfaces as getNetworkInterfaces } from 'node:os';
-import handler from 'serve-handler';
+import handler from './handler.js';
 
 const networkInterfaces = getNetworkInterfaces();
 
