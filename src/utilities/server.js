@@ -6,7 +6,7 @@ import compression from 'compression';
 import isPortReachable from 'is-port-reachable';
 import chalk from 'chalk';
 import { getNetworkAddress, registerCloseListener } from './http.js';
-import { promisify } from './promise.js';
+import { promisify } from 'node:util';
 import { logger } from './logger.js';
 
 const compress = promisify(compression());
