@@ -10,6 +10,6 @@
     "serve-handler": "^6.1.5"
   },
   "scripts": {
-    "start": "node src/main.js public/ --listen=80 --debug"
+    "start": "node src/main.js"
   }
 }
