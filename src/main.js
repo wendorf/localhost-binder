@@ -4,7 +4,6 @@ import { promisify } from 'node:util';
 import { networkInterfaces as getNetworkInterfaces } from 'node:os';
 import handler from 'serve-handler';
 import compression from 'compression';
-import isPortReachable from 'is-port-reachable';
 
 const networkInterfaces = getNetworkInterfaces();
 const compress = promisify(compression());
@@ -103,23 +102,6 @@ export const startServer = async (
             `Failed to serve: ${error.stack?.toString() ?? error.message}`,
         );
     });
-
-    // If the endpoint is a non-zero port, make sure it is not occupied.
-    if (
-        typeof endpoint.port === 'number' &&
-        !isNaN(endpoint.port) &&
-        endpoint.port !== 0
-    ) {
-        const port = endpoint.port;
-        const isClosed = await isPortReachable(port, {
-            host: endpoint.host ?? 'localhost',
-        });
-        // If the port is already taken, then start the server on a random port
-        // instead.
-        if (isClosed) return startServer({ port: 0 }, config, port);
-
-        // Otherwise continue on to starting the server.
-    }
 
     // Finally, start the server.
     return new Promise((resolve, _reject) => {

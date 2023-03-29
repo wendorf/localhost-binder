@@ -5,7 +5,6 @@
   },
   "dependencies": {
     "compression": "^1.7.4",
-    "is-port-reachable": "^4.0.0",
     "serve-handler": "^6.1.5"
   },
   "scripts": {
