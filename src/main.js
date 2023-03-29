@@ -1,6 +1,5 @@
 import { exit, env, stdout } from 'node:process';
 import chalk from 'chalk';
-import boxen from 'boxen';
 import { startServer } from './utilities/server.js';
 import { registerCloseListener } from './utilities/http.js';
 
@@ -27,16 +26,6 @@ for (const endpoint of args['--listen']) {
         args,
     );
 
-    // If we are not in a TTY or Node is running in production mode, print
-    // a single line of text with the server address.
-    if (!stdout.isTTY || env.NODE_ENV === 'production') {
-        const suffix = local ? ` at ${local}` : '';
-        console.info(`Accepting connections${suffix}`);
-
-        continue;
-    }
-
-    // Else print a fancy box with the server address.
     let message = chalk.green('Serving!');
     if (local) {
         const prefix = network ? '- ' : '';
@@ -52,13 +41,7 @@ for (const endpoint of args['--listen']) {
             )} is in use.`,
         );
 
-    console.log(
-        boxen(message, {
-            padding: 1,
-            borderColor: 'green',
-            margin: 1,
-        }),
-    );
+    console.info(message);
 }
 
 // Print out a message to let the user know we are shutting down the server
