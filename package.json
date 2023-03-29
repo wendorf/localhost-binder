@@ -4,9 +4,19 @@
     "node": ">= 16"
   },
   "dependencies": {
-    "serve": "^14.2.0"
+    "ajv": "^8.12.0",
+    "arg": "^5.0.2",
+    "boxen": "^7.0.2",
+    "chalk": "^5.2.0",
+    "chalk-template": "^1.0.0",
+    "clipboardy": "^3.0.0",
+    "compression": "^1.7.4",
+    "is-port-reachable": "^4.0.0",
+    "serve": "^14.2.0",
+    "serve-handler": "^6.1.5",
+    "update-check": "^1.5.4"
   },
   "scripts": {
-    "start": "serve public/ --listen=80 --debug"
+    "start": "node src/main.js public/ --listen=80 --debug"
   }
 }
