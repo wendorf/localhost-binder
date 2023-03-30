@@ -3,7 +3,7 @@ import {exit} from 'node:process';
 import {networkInterfaces as getNetworkInterfaces} from 'node:os';
 
 let serverInfo;
-const identifier = "🤞"
+const identifier = "😻"
 
 export const startServer = (endpoint) => {
     const server = http.createServer();
@@ -23,8 +23,7 @@ export const startServer = (endpoint) => {
         </head>
         <body>
           <p>${identifier}</p>
-          <p>endpoint: ${JSON.stringify(endpoint)}</p>
-          <p>server info: ${JSON.stringify(getServerInfo())}</p>
+          <pre>${JSON.stringify(getServerInfo(), null, 2)}</pre>
         </body>
         </html>
         `)
@@ -53,7 +52,7 @@ export const startServer = (endpoint) => {
                 network = ip ? `${protocol}://${ip}:${details.port}` : undefined;
             }
 
-            serverInfo = {local: local, network: network};
+            serverInfo = {local: local, network: network, endpoint: endpoint};
         }
         return serverInfo;
     }
@@ -113,14 +112,5 @@ const getNetworkAddress = () => {
 };
 
 const printServerInfo = (serverInfo) => {
-    let message = ""
-    if (serverInfo.local) {
-        const prefix = serverInfo.network ? '- ' : '';
-        const space = serverInfo.network ? '    ' : '  ';
-
-        message += `\n\n${prefix}Local:${space}${serverInfo.local}`;
-    }
-    if (serverInfo.network) message += `\n- Network:  ${serverInfo.network}`;
-
-    console.info(message);
+    console.info("serverInfo", serverInfo);
 }
