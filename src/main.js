@@ -110,7 +110,7 @@ const registerCloseListener = (fn) => {
 
 const endpoint = { port: process.env.TEST_PORT || 80 }
 if (process.env.TEST_HOST) {
-    endpoint.host = process.env.HOST
+    endpoint.host = process.env.TEST_HOST
 }
 await startServer(endpoint);
 
