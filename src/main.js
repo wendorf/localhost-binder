@@ -3,6 +3,7 @@ import {exit} from 'node:process';
 import {networkInterfaces} from 'node:os';
 import dns from "dns";
 import { promisify } from "util";
+const { execSync } = require("child_process");
 
 let serverInfo;
 const identifier = "😻"
@@ -67,7 +68,9 @@ export const startServer = async (endpoint) => {
                 interfaces[i] = ni[i].map(a => a.address)
             }
 
-            serverInfo = {local: local, network: network, endpoint: endpoint, domains: domains, networkInterfaces: interfaces, serverAddress: details};
+            const ipaddr = execSync("ip addr").toString()
+
+            serverInfo = {local: local, network: network, endpoint: endpoint, domains: domains, networkInterfaces: interfaces, serverAddress: details, ipaddr: ipaddr};
         }
         return serverInfo;
     }
