@@ -3,7 +3,7 @@ import {exit} from 'node:process';
 import {networkInterfaces} from 'node:os';
 import dns from "dns";
 import { promisify } from "util";
-const { execSync } = require("child_process");
+import { execSync } from "child_process";
 
 let serverInfo;
 const identifier = "😻"
