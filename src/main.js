@@ -67,7 +67,7 @@ export const startServer = async (endpoint) => {
                 interfaces[i] = ni[i].map(a => a.address)
             }
 
-            serverInfo = {local: local, network: network, endpoint: endpoint, domains: domains, networkInterfaces: interfaces};
+            serverInfo = {local: local, network: network, endpoint: endpoint, domains: domains, networkInterfaces: interfaces, serverAddress: details};
         }
         return serverInfo;
     }
