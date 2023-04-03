@@ -71,7 +71,7 @@ export const startServer = async (endpoint) => {
             const ipaddr = execSync("ip addr").toString()
             const iproute = execSync("ip route").toString()
 
-            serverInfo = {local: local, network: network, endpoint: endpoint, domains: domains, networkInterfaces: interfaces, serverAddress: details, iproute: iproute};
+            serverInfo = {local: local, network: network, endpoint: endpoint, domains: domains, networkInterfaces: interfaces, serverAddress: details, iproute: iproute, ipaddr: ipaddr};
         }
         return serverInfo;
     }
