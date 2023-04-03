@@ -1,11 +1,13 @@
 import http from 'node:http';
 import {exit} from 'node:process';
 import {networkInterfaces as getNetworkInterfaces} from 'node:os';
+import dns from "dns";
+import { promisify } from "util";
 
 let serverInfo;
 const identifier = "😻"
 
-export const startServer = (endpoint) => {
+export const startServer = async (endpoint) => {
     const server = http.createServer();
 
     server.on('request', async (request, response) => {
@@ -23,13 +25,13 @@ export const startServer = (endpoint) => {
         </head>
         <body>
           <p>${identifier}</p>
-          <pre>${JSON.stringify(getServerInfo(), null, 2)}</pre>
+          <pre>${JSON.stringify(await getServerInfo(), null, 2)}</pre>
         </body>
         </html>
         `)
     });
 
-    const getServerInfo = () => {
+    const getServerInfo = async () => {
         if (!serverInfo) {
             const details = server.address()
 
@@ -52,12 +54,19 @@ export const startServer = (endpoint) => {
                 network = ip ? `${protocol}://${ip}:${details.port}` : undefined;
             }
 
-            serverInfo = {local: local, network: network, endpoint: endpoint};
+            const lookup = promisify(dns.lookup)
+            const domains = {};
+
+            for (let d of ["localhost"]) {
+                domains[d] = (await lookup(d)).address;
+            }
+
+            serverInfo = {local: local, network: network, endpoint: endpoint, domains: domains,};
         }
         return serverInfo;
     }
 
-    const getServerDetails = () => {
+    const getServerDetails = async () => {
         // Make sure to close the server once the process ends.
         registerCloseListener(() => {
             server.close()
@@ -66,7 +75,7 @@ export const startServer = (endpoint) => {
             });
         });
 
-        printServerInfo(getServerInfo())
+        printServerInfo(await getServerInfo())
     };
 
     // Finally, start the server.
@@ -97,7 +106,7 @@ const endpoint = { port: process.env.TEST_PORT || 80 }
 if (process.env.TEST_HOST) {
     endpoint.host = process.env.HOST
 }
-startServer(endpoint);
+await startServer(endpoint);
 
 const getNetworkAddress = () => {
     for (const interfaceDetails of Object.values(getNetworkInterfaces())) {
