@@ -1,6 +1,6 @@
 import http from 'node:http';
 import {exit} from 'node:process';
-import {networkInterfaces as getNetworkInterfaces} from 'node:os';
+import {networkInterfaces} from 'node:os';
 import dns from "dns";
 import { promisify } from "util";
 
@@ -61,7 +61,13 @@ export const startServer = async (endpoint) => {
                 domains[d] = (await lookup(d)).address;
             }
 
-            serverInfo = {local: local, network: network, endpoint: endpoint, domains: domains,};
+            const interfaces = {}
+            const ni = networkInterfaces()
+            for (let i in ni) {
+                interfaces[i] = ni[i].map(a => a.address)
+            }
+
+            serverInfo = {local: local, network: network, endpoint: endpoint, domains: domains, networkInterfaces: interfaces};
         }
         return serverInfo;
     }
@@ -109,7 +115,7 @@ if (process.env.TEST_HOST) {
 await startServer(endpoint);
 
 const getNetworkAddress = () => {
-    for (const interfaceDetails of Object.values(getNetworkInterfaces())) {
+    for (const interfaceDetails of Object.values(networkInterfaces())) {
         if (!interfaceDetails) continue;
 
         for (const details of interfaceDetails) {
