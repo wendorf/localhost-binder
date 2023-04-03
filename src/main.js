@@ -13,7 +13,7 @@ export const startServer = (endpoint) => {
             'Content-Disposition': 'inline; filename="index.html"',
             'Content-Type': 'text/html; charset=utf-8'
         });
-        response.write(`
+        response.end(`
         <!doctype html>
         <html lang="en" dir="ltr">
         <head>
